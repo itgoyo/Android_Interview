@@ -43,7 +43,7 @@ android:layout_gravity是自己相对于父容器的位置
 （3）runOnUiThread；
 （4）View.post(runnable)。
 ```
-### Android进程有哪些
+### 6.Android进程有哪些
 ```
 前台进程
 用户当前操作所必需的进程。如果一个进程满足以下任一条件，即视为前台进程：
@@ -70,6 +70,88 @@ android:layout_gravity是自己相对于父容器的位置
 空进程
 不含任何活动应用组件的进程。保留这种进程的的唯一目的是用作缓存，以缩短下次在其中运行组件所需的启动时间。 为使总体系统资源在进程缓存和底层内核缓存之间保持平衡，系统往往会终止这些进程。
 ```
+
+### 7.activity的startActivity和context的startActivity区别
+```
+(1)从Activity中启动新的Activity时可以直接mContext.startActivity(intent)就好，
+
+(2)如果从其他Context中启动Activity则必须给intent设置Flag:
+
+intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK) ;
+mContext.startActivity(intent);
+```
+
+### 8.如何保证Service杀不死
+```
+提供进程优先级，降低进程被杀死的概率
+方法一：监控手机锁屏解锁事件，在屏幕锁屏时启动1个像素的 Activity，在用户解锁时将 Activity 销毁掉。
+
+方法二：启动前台service。
+
+方法三：提升service优先级： 在AndroidManifest.xml文件中对于intent-filter可以通过android:priority = "1000"这个属性设置最高优先级，1000是最高值，如果数字越小则优先级越低，同时适用于广播。
+
+在进程被杀死后，进行拉活
+
+方法一：注册高频率广播接收器，唤起进程。如网络变化，解锁屏幕，开机等
+
+方法二：双进程相互唤起。
+
+方法三：依靠系统唤起。
+
+方法四：onDestroy方法里重启service：service +broadcast 方式，就是当service走ondestory的时候，发送一个自定义的广播，当收到广播的时候，重新启动service；
+
+依靠第三方 根据终端不同，在小米手机（包括 MIUI）接入小米推送、华为手机接入华为推送；其他手机可以考虑接入腾讯信鸽或极光推送与小米推送做 A/B Test。
+```
+
+### 9.StringBuffer跟StringBuider的区别
+```
+StringBuider非线程安全，执行速度快，单线程用这个类
+```
+
+### 10.sleep(), wait()的区别
+```
+sleep不释放同步锁，自动唤醒，需要try catch,  wait释放同步锁，需要notify来唤醒
+
+sleep是线程的方法    wait是Object的方法
+```
+
+### 11.LinkedList跟ArrayList的区别
+```
+一个链表结构，一个数组结构，LinkedList查找慢，插入快，ArrayList查找快，插入慢。
+```
+
+### 12.手写一个单例
+```
+public class SigleInstance {
+
+private static SigleInstance instance;
+
+public static SigleInstance getInstance() {
+
+        if (instance == null) {
+
+            syncronized(SigleInstance.class) {
+
+                    if (instance == null) {
+
+                            instance = new SingleInstance();
+
+                    }
+
+            }
+
+       }
+
+        return instance;
+
+}
+
+}
+```
+
+
+
+
 
 ------------
 
